@@ -17,6 +17,15 @@
         "lv_demo_benchmark.h": "c",
         "lv_demo_keypad_encoder.h": "c",
         "ui.h": "c",
-        "hello.h": "c"
+        "hello.h": "c",
+        "painlessmesh.h": "c",
+        "painlesstaskoptions.h": "c",
+        "list": "c",
+        "configuration.hpp": "c",
+        "asynctcp.h": "c",
+        "functional": "c",
+        "wifi_mesh.h": "c",
+        "wifi.h": "c",
+        "arduino.h": "c"
     }
 }

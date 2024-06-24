@@ -9,6 +9,7 @@
 #include "hello.h"
 #include <src/examples/lv_examples.h>
 #include "ui.h"
+#include "wifi_mesh.h"
 
 #define EXAMPLE_LVGL_TICK_PERIOD_MS 2
 
@@ -87,12 +88,7 @@ void my_touchpad_read(lv_indev_drv_t *indev_drv, lv_indev_data_t *data) {
 void setup() {
   Serial.begin(115200); /* prepare for possible serial debug */
 
-  String LVGL_Arduino = "Hello Arduino! ";
-  LVGL_Arduino += String('V') + lv_version_major() + "." + lv_version_minor() + "." + lv_version_patch();
-
-  Serial.println(LVGL_Arduino);
-  Serial.println("I am LVGL_Arduino");
-
+  mesh_setup();
   lv_init();
 
 #if LV_USE_LOG != 0
@@ -200,6 +196,8 @@ void setup() {
 void loop() {
   lv_timer_handler(); /* let the GUI do its work */
   delay(5);
+  mesh_loop();
+  
 }
 #endif
 

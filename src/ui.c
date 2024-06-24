@@ -14,12 +14,21 @@ void ui_Screen1_screen_init(void);
 lv_obj_t * ui_Screen1;
 lv_obj_t * ui_Label1;
 lv_obj_t * ui_Label2;
+lv_obj_t * ui_Label3;
+lv_obj_t * ui_Label_name;
+lv_obj_t * ui_Label_battery;
+lv_obj_t * ui_Bar1;
+lv_obj_t * ui_Chart1;
+
+
+// SCREEN: ui_Screen2
+void ui_Screen2_screen_init(void);
+lv_obj_t * ui_Screen2;
 lv_obj_t * ui____initial_actions0;
-uint8_t count_click = 0;
 
 ///////////////////// TEST LVGL SETTINGS ////////////////////
 #if LV_COLOR_DEPTH != 16
-    #error "LV_COLOR_DEPTH should be 32bit to match SquareLine Studio's settings"
+    #error "LV_COLOR_DEPTH should be 16bit to match SquareLine Studio's settings"
 #endif
 #if LV_COLOR_16_SWAP !=0
     #error "LV_COLOR_16_SWAP should be 0 to match SquareLine Studio's settings"
@@ -28,35 +37,6 @@ uint8_t count_click = 0;
 ///////////////////// ANIMATIONS ////////////////////
 
 ///////////////////// FUNCTIONS ////////////////////
-void btn_event_cb(lv_event_t * e)
-{
-    lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t * btn = lv_event_get_target(e);
-    if(code == LV_EVENT_CLICKED) {
-         
-        count_click++;
-
-        /*Get the first child of the button which is the label and change its text*/
-        lv_obj_t * label = lv_obj_get_child(btn, 0);
-        lv_label_set_text_fmt(label, "Button: %d", count_click);
-        lv_label_set_text_fmt(ui_Label1,"click time:%d",count_click);
-    }
-}
-
-/**
- * Create a button with a label and react on click event.
- */
-void lv_example_get_started_1(void)
-{
-    lv_obj_t * btn = lv_btn_create(lv_scr_act());     /*Add a button the current screen*/
-    lv_obj_set_pos(btn, 10, 10);                            /*Set its position*/
-    lv_obj_set_size(btn, 120, 50);                          /*Set its size*/
-    lv_obj_add_event_cb(btn, btn_event_cb, LV_EVENT_ALL, NULL);           /*Assign a callback to the button*/
-
-    lv_obj_t * label = lv_label_create(btn);          /*Add a label to the button*/
-    lv_label_set_text(label, "Button");                     /*Set the labels text*/
-    lv_obj_center(label);
-}
 
 ///////////////////// SCREENS ////////////////////
 
@@ -67,7 +47,7 @@ void ui_init(void)
                                                false, LV_FONT_DEFAULT);
     lv_disp_set_theme(dispp, theme);
     ui_Screen1_screen_init();
+    ui_Screen2_screen_init();
     ui____initial_actions0 = lv_obj_create(NULL);
     lv_disp_load_scr(ui_Screen1);
-    lv_example_get_started_1();
 }

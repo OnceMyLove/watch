@@ -13,21 +13,21 @@ void ui_Screen1_screen_init(void)
     ui_Label1 = lv_label_create(ui_Screen1);
     lv_obj_set_width(ui_Label1, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(ui_Label1, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_Label1, -63);
+    lv_obj_set_x(ui_Label1, 0);
     lv_obj_set_y(ui_Label1, -70);
     lv_obj_set_align(ui_Label1, LV_ALIGN_CENTER);
 
     ui_Label2 = lv_label_create(ui_Screen1);
     lv_obj_set_width(ui_Label2, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(ui_Label2, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_Label2, -63);
+    lv_obj_set_x(ui_Label2, 0);
     lv_obj_set_y(ui_Label2, -33);
     lv_obj_set_align(ui_Label2, LV_ALIGN_CENTER);
 
     ui_Label3 = lv_label_create(ui_Screen1);
     lv_obj_set_width(ui_Label3, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(ui_Label3, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_Label3, -62);
+    lv_obj_set_x(ui_Label3, 0);
     lv_obj_set_y(ui_Label3, 2);
     lv_obj_set_align(ui_Label3, LV_ALIGN_CENTER);
 

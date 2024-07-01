@@ -195,6 +195,7 @@ void setup() {
 #if 1
 void loop() {
   lv_timer_handler(); /* let the GUI do its work */
+  
   delay(5);
   mesh_loop();
   

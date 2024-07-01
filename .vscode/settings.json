@@ -26,6 +26,8 @@
         "functional": "c",
         "wifi_mesh.h": "c",
         "wifi.h": "c",
-        "arduino.h": "c"
+        "arduino.h": "c",
+        "cstring": "cpp",
+        "typeinfo": "cpp"
     }
 }

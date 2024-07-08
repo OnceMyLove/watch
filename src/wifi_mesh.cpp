@@ -185,11 +185,14 @@ void show(void)
 {
   device* visit=p_head;
   //最大值排序链表  大->小
-  device* p_max=NULL;
-  device* max_now_location=p_max;//用于最大值排序链表的定位指针
+  // device max={NULL,0,NULL};
+  // device* p_max=&max;
+  device* p_max=(device*)malloc(sizeof(device));
+  p_max->next=NULL;//指针一定要初始化，否则乱指
+  
   while(visit!=NULL)//visit指针用于对p_head链表的搜寻
   {
-
+    device* max_now_location=p_max;//用于最大值排序链表的定位指针,每次循环都要返回到头部
     printf("logServer: Received from %s  value=%d\n",visit->name,visit->value);
     device* p_this=(device*)malloc(sizeof(device));
     p_this->name=visit->name;
@@ -198,24 +201,27 @@ void show(void)
     if(max_now_location==NULL)
     {
       max_now_location=p_this;
-      p_max=max_now_location;//一定要有这一步，不然p_max仍为空，因为上一步给max_now_location重新赋值了
+      p_max->next=max_now_location;//一定要有这一步，不然p_max仍为空，因为上一步给max_now_location重新赋值了
     }
     else 
     {
-      while(max_now_location->next!=NULL)
+      //由于max_now_location是单向链表，因此程序设计时尽量考虑后插入，不考虑前插入
+      while(max_now_location->next!=NULL) //max_now_location->next为空时循环退出
       {
-        if((visit->value<max_now_location->value)&(visit->value>max_now_location->next->value))//当前值比max_now_location小，且大于max_now_location下一个值
+        if(visit->value<max_now_location->value)//当前值比max_now_location->next小，则寻找下一个
         {
-          
+          max_now_location=max_now_location->next;
+        }
+        else  //否则，提早退出,this要在max_now_location和max_now_location->next之间
+        {
           break;
         }
-        max_now_location=max_now_location->next;
         printf("while(max_now_location->next!=NULL)");//程序运行时会进入此死循环max_now_location->next可能永远不空注意其赋值。
       }
-      if(max_now_location->next==NULL)
+      // 注意这里要有条件判断，因为循环退出的条件变多了，不止max_now_location->next为空时循环退出
+      if(max_now_location->next==NULL)  //假如this是最后一项
       {
         max_now_location->next=p_this;
-        
       }
       else
       {
@@ -228,7 +234,7 @@ void show(void)
     visit=visit->next;
   }
   printf("exit");
-  visit=p_max;
+  visit=p_max->next;
   
   if(visit!=NULL)
   {

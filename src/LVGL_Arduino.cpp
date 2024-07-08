@@ -89,6 +89,8 @@ void setup() {
   Serial.begin(115200); /* prepare for possible serial debug */
 
   mesh_setup();
+  // tim1.attach(1,show);
+
   lv_init();
 
 #if LV_USE_LOG != 0

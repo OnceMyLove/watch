@@ -1,8 +1,4 @@
-#include <Arduino.h>
-#include "painlessMesh.h"
 #include "wifi_mesh.h"
-#include "ui.h"
-#include "cJSON.h"
 
 
 
@@ -31,8 +27,8 @@ typedef struct device{
 //初始化一个头指针和头节点
 // device head={"wyc",0,NULL};
 device* p_head=NULL;
-//最大值排序链表  大->小
-device* p_max=NULL;
+
+
 
 // 每10秒发送我的ID以通知其他人。
 Task logServerTask(10000, TASK_FOREVER, []() {
@@ -103,61 +99,7 @@ void receivedCallback( uint32_t from, String &msg ) {
   // lv_label_set_text_fmt(ui_Label1,"device1:%d",msg_value);
   // printf("logServer: Received from %s  value=%d\n", msg_topic,msg_value);
   create_or_updata_device(msg_topic,msg_value);
-  device* visit=p_head;
-  device* max_now_location=p_max;//用于最大值排序链表的定位指针
-  while(visit!=NULL)
-  {
-
-    printf("logServer: Received from %s  value=%d\n",visit->name,visit->value);
-    device* p_this=(device*)malloc(sizeof(device));
-    p_this->name=visit->name;
-    p_this->value=visit->value;
-    p_this->next=NULL;
-    if(max_now_location==NULL)
-    {
-      max_now_location=p_this;
-      p_max=max_now_location;//一定要有这一步，不然p_max仍为空，因为上一步给max_now_location重新赋值了
-    }
-    else 
-    {
-      while(max_now_location->next!=NULL)
-      {
-        if((visit->value<max_now_location->value)&(visit->value<max_now_location->next->value))
-        {
-          max_now_location=max_now_location->next;
-          
-          break;
-        }
-      }
-      if(max_now_location->next==NULL)
-      {
-        max_now_location->next=p_this;
-        
-      }
-      else
-      {
-        p_this->next=max_now_location->next;
-        max_now_location->next=p_this;
-      }
-    }
-    visit=visit->next;
-  }
-  visit=p_max;
-  
-  if(visit!=NULL)
-  {
-    lv_label_set_text_fmt(ui_Label1,"%s,value:{%d}\n",visit->name,visit->value);
-  }
-  if(visit->next!=NULL)
-  {
-    visit=visit->next;
-    lv_label_set_text_fmt(ui_Label2,"%s,value:{%d}\n",visit->name,visit->value);
-  }
-  if(visit->next!=NULL)
-  {
-    visit=visit->next;
-    lv_label_set_text_fmt(ui_Label3,"%s,value:{%d}\n",visit->name,visit->value);
-  }
+  show();
   
 }
 
@@ -239,3 +181,67 @@ void create_or_updata_device(char* name,int value)
 }
 
 
+void show(void)
+{
+  device* visit=p_head;
+  //最大值排序链表  大->小
+  device* p_max=NULL;
+  device* max_now_location=p_max;//用于最大值排序链表的定位指针
+  while(visit!=NULL)//visit指针用于对p_head链表的搜寻
+  {
+
+    printf("logServer: Received from %s  value=%d\n",visit->name,visit->value);
+    device* p_this=(device*)malloc(sizeof(device));
+    p_this->name=visit->name;
+    p_this->value=visit->value;
+    p_this->next=NULL;
+    if(max_now_location==NULL)
+    {
+      max_now_location=p_this;
+      p_max=max_now_location;//一定要有这一步，不然p_max仍为空，因为上一步给max_now_location重新赋值了
+    }
+    else 
+    {
+      while(max_now_location->next!=NULL)
+      {
+        if((visit->value<max_now_location->value)&(visit->value>max_now_location->next->value))//当前值比max_now_location小，且大于max_now_location下一个值
+        {
+          
+          break;
+        }
+        max_now_location=max_now_location->next;
+        printf("while(max_now_location->next!=NULL)");//程序运行时会进入此死循环max_now_location->next可能永远不空注意其赋值。
+      }
+      if(max_now_location->next==NULL)
+      {
+        max_now_location->next=p_this;
+        
+      }
+      else
+      {
+        p_this->next=max_now_location->next;
+        max_now_location->next=p_this;
+      }
+    }
+    if(visit->next==NULL)printf("NULL");
+    
+    visit=visit->next;
+  }
+  printf("exit");
+  visit=p_max;
+  
+  if(visit!=NULL)
+  {
+    lv_label_set_text_fmt(ui_Label1,"%s,value:{%d}\n",visit->name,visit->value);
+  }
+  if(visit->next!=NULL)
+  {
+    visit=visit->next;
+    lv_label_set_text_fmt(ui_Label2,"%s,value:{%d}\n",visit->name,visit->value);
+  }
+  if(visit->next!=NULL)
+  {
+    visit=visit->next;
+    lv_label_set_text_fmt(ui_Label3,"%s,value:{%d}\n",visit->name,visit->value);
+  }
+}

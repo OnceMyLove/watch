@@ -1,0 +1,121 @@
+#include "lvgl/lvgl.h"
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct Device {
+    char name[32];
+    lv_coord_t value;
+    struct Device *next;
+} Device;
+
+Device *device_head = NULL; // 设备链表头指针
+lv_obj_t *chart;            // 图表对象
+lv_chart_series_t *series;  // 图表系列
+
+void update_chart();
+
+
+
+
+void add_device(const char *name, lv_coord_t value) {
+    Device *new_device = malloc(sizeof(Device));
+    strcpy(new_device->name, name);
+    new_device->value = value;
+    new_device->next = device_head;
+    device_head = new_device;
+
+    update_chart();
+}
+
+void remove_device(const char *name) {
+    Device **ptr = &device_head, *temp;
+    while (*ptr) {
+        if (strcmp((*ptr)->name, name) == 0) {
+            temp = *ptr;
+            *ptr = (*ptr)->next;
+            free(temp);
+            update_chart();
+            break;
+        }
+        ptr = &(*ptr)->next;
+    }
+}
+
+void update_chart() {
+    lv_chart_clear_series(chart, series);  // 清除当前图表数据
+
+    Device *current = device_head;
+    int count = 0;
+    while (current) {
+        lv_chart_set_next(chart, series, current->value);
+        count++;
+        current = current->next;
+    }
+
+    // 重新设置X轴标签
+    lv_chart_set_point_count(chart, count);  // 设置点数匹配设备数量
+}
+
+void create_chart(lv_obj_t *parent) {
+    chart = lv_chart_create(parent, NULL);
+    lv_obj_set_size(chart, 200, 150);
+    lv_obj_align(chart, NULL, LV_ALIGN_CENTER, 0, 0);
+    series = lv_chart_add_series(chart, lv_palette_main(LV_PALETTE_RED), LV_CHART_AXIS_PRIMARY_Y);
+
+    lv_chart_set_type(chart, LV_CHART_TYPE_LINE);  // 线形图
+    lv_chart_set_div_line_count(chart, 0, 0);      // 不显示分割线
+    lv_chart_set_point_count(chart, 0);            // 初始化时没有数据点
+}
+
+
+//关于标签的优化：100个标签怎么填写
+void show(void) {
+    device* current = p_head;
+    int label_count = 0;
+    lv_obj_t* labels[3] = { ui_Label1, ui_Label2, ui_Label3 }; // 假设你有3个标签
+
+    while (current != NULL && label_count < 3) {
+        lv_label_set_text_fmt(labels[label_count], "%s, value: %d", current->name, current->value);
+        label_count++;
+        current = current->next;
+    }
+
+    // 如果设备少于3个，清除剩余标签的文本
+    for (int i = label_count; i < 3; i++) {
+        lv_label_set_text(labels[i], "");
+    }
+}
+
+
+修改 create_or_update_device 函数
+这个函数应该简化逻辑，直接在链表中搜索设备，如果找到则更新值，如果未找到则添加新设备。
+void create_or_update_device(char* name, int value) {
+    device* current = p_head;
+    device* last = NULL;
+
+    // 搜索设备是否存在
+    while (current != NULL) {
+        if (strcmp(current->name, name) == 0) {
+            current->value = value; // 更新存在的设备值
+            printf("Updated device %s with new value %d\n", name, value);
+            return;
+        }
+        last = current;
+        current = current->next;
+    }
+
+    // 添加新设备
+    device* new_device = (device*)malloc(sizeof(device));
+    new_device->name = strdup(name);  // 分配内存并复制字符串
+    new_device->value = value;
+    new_device->next = NULL;
+
+    if (last == NULL) {
+        p_head = new_device; // 列表为空时，新设备成为头结点
+    } else {
+        last->next = new_device; // 否则，添加到列表末尾
+    }
+
+    printf("Added new device %s with value %d\n", name, value);
+}
+

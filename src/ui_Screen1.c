@@ -59,18 +59,27 @@ void ui_Screen1_screen_init(void)
     ui_Chart1 = lv_chart_create(ui_Screen1);
     lv_obj_set_width(ui_Chart1, 200);
     lv_obj_set_height(ui_Chart1, 90);
-    lv_obj_set_x(ui_Chart1, 0);
+    lv_obj_set_x(ui_Chart1, 10);
     lv_obj_set_y(ui_Chart1, 68);
     lv_obj_set_align(ui_Chart1, LV_ALIGN_CENTER);
     lv_chart_set_type(ui_Chart1, LV_CHART_TYPE_LINE);
     lv_chart_set_axis_tick(ui_Chart1, LV_CHART_AXIS_PRIMARY_X, 10, 5, 5, 2, true, 50);
+    /*这行代码的意义如下：
+    ui_Chart1: 目标图表对象。
+    LV_CHART_AXIS_PRIMARY_X: 设置的是X轴的主轴。
+    10: 主刻度线的长度为10像素。
+    5: 次刻度线的长度为5像素。
+    5: 在整个轴上有5个主刻度。
+    2: 每个主刻度之间有2个次刻度。
+    true: 在刻度线下方启用标签的显示。
+    50: 刻度线和标签的绘制区域的高度为50像素。*/
     lv_chart_set_axis_tick(ui_Chart1, LV_CHART_AXIS_PRIMARY_Y, 10, 5, 5, 2, true, 50);
-    lv_chart_set_axis_tick(ui_Chart1, LV_CHART_AXIS_SECONDARY_Y, 10, 5, 5, 2, true, 25);
+    // lv_chart_set_axis_tick(ui_Chart1, LV_CHART_AXIS_SECONDARY_Y, 10, 5, 5, 2, true, 25);
     lv_chart_series_t * ui_Chart1_series_1 = lv_chart_add_series(ui_Chart1, lv_color_hex(0x808080),
                                                                  LV_CHART_AXIS_PRIMARY_Y);
     static lv_coord_t ui_Chart1_series_1_array[] = { 0, 10, 20, 40, 80, 80, 40, 20, 10, 0 };
     lv_chart_set_ext_y_array(ui_Chart1, ui_Chart1_series_1, ui_Chart1_series_1_array);
-
+    
 
 
 

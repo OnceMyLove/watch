@@ -122,13 +122,14 @@ void setup() {
     }
   }
 
+  //蜂鸣器功能代码，这里暂时关闭
   // Control the buzzer if the device is found
-  if (foundDevice) {
-    pinMode(BEE_PIN, OUTPUT);
-    tone(BEE_PIN, 4000);
-    delay(500);       // Buzz for 0.5 seconds
-    noTone(BEE_PIN);  // Stop the buzzer
-  }
+  // if (foundDevice) {
+  //   pinMode(BEE_PIN, OUTPUT);
+  //   tone(BEE_PIN, 4000);
+  //   delay(500);       // Buzz for 0.5 seconds
+  //   noTone(BEE_PIN);  // Stop the buzzer
+  // }
 
   lv_disp_draw_buf_init(&draw_buf, buf, NULL, screenWidth * screenHeight / 10);
 

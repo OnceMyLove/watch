@@ -28,6 +28,10 @@ typedef struct device{
 // device head={"wyc",0,NULL};
 device* p_head=NULL;
 
+void update_chart(void);
+// lv_chart_series_t * ui_Chart1_series_1 = lv_chart_add_series(ui_Chart1, lv_color_hex(0x808080),
+//                                                                  LV_CHART_AXIS_PRIMARY_Y);
+
 
 
 // 每10秒发送我的ID以通知其他人。
@@ -89,7 +93,7 @@ void mesh_loop(void) {
 
 void receivedCallback( uint32_t from, String &msg ) {
   msg.c_str(); //c_str()获取字符串首字母的地址
-  char *p_msg=new char[strlen(msg.c_str()+1)];
+  char *p_msg=new char[strlen(msg.c_str()+1)];//在C++中，std:String对象一单创建，其值不可变，所以需要复制一份
   strcpy(p_msg,msg.c_str());
   // printf("logServer: Received from %u msg=%s\n", from, msg.c_str());
   get_device_and_value(p_msg,&msg_topic,&msg_value);
@@ -100,7 +104,8 @@ void receivedCallback( uint32_t from, String &msg ) {
   // printf("logServer: Received from %s  value=%d\n", msg_topic,msg_value);
   create_or_updata_device(msg_topic,msg_value);
   show();
-  
+
+  // update_chart();
 }
 
 char* length_of_string(char* p,int start,int end)  //截取字符串部分，start为正数第几位，end为倒数第几位
@@ -116,7 +121,9 @@ char* length_of_string(char* p,int start,int end)  //截取字符串部分，sta
   return p;
 }
 
-void get_device_and_value( char* p_msg,char** msg_topic,int* msg_value)
+void get_device_and_value( char* p_msg,char** msg_topic,int* msg_value)//获取设备名字和值
+//使用msg_topic是因为名字是字符串，需要指针去指，而要修改指针得用指针的指针去修改。
+//拓展：是否可以简化，不用指针的指针
 {
   cJSON* json=cJSON_Parse(p_msg);
   cJSON* topic;
@@ -146,7 +153,7 @@ void get_device_and_value( char* p_msg,char** msg_topic,int* msg_value)
   }
 }
 
-void create_or_updata_device(char* name,int value)
+void create_or_updata_device(char* name,int value)//如果是新设备则创建，如果之前创建过，则更新设备的值
 {
   int is_seted=0;//判断是否已经接收过此设备，0为没有，1为有
   device* p=p_head;
@@ -181,44 +188,48 @@ void create_or_updata_device(char* name,int value)
 }
 
 
-void show(void)
+void show(void)//展示最大的三个值
 {
   device* visit=p_head;
   //最大值排序链表  大->小
-  device* p_max=NULL;
-  device* max_now_location=p_max;//用于最大值排序链表的定位指针
+  device* p_max=NULL;//用于最大值排序指针的头指针
+  
   while(visit!=NULL)//visit指针用于对p_head链表的搜寻
   {
-
+    device* max_now_location=p_max;//用于最大值排序链表的定位指针,初始指向头指针
     printf("logServer: Received from %s  value=%d\n",visit->name,visit->value);
     device* p_this=(device*)malloc(sizeof(device));
     p_this->name=visit->name;
     p_this->value=visit->value;
     p_this->next=NULL;
-    if(max_now_location==NULL)
+    if(max_now_location==NULL)//如果一开始头指针处为空
     {
       max_now_location=p_this;
       p_max=max_now_location;//一定要有这一步，不然p_max仍为空，因为上一步给max_now_location重新赋值了
     }
     else 
     {
-      while(max_now_location->next!=NULL)
+      if(max_now_location->value<p_this->value)//首先与max_now_location比较，大于max_now_location放前面，小于max_now_location进下一步
       {
-        if((visit->value<max_now_location->value)&(visit->value>max_now_location->next->value))//当前值比max_now_location小，且大于max_now_location下一个值
-        {
-          
-          break;
-        }
-        max_now_location=max_now_location->next;
-        printf("while(max_now_location->next!=NULL)");//程序运行时会进入此死循环max_now_location->next可能永远不空注意其赋值。
-      }
-      if(max_now_location->next==NULL)
-      {
-        max_now_location->next=p_this;
-        
+        p_this->next=max_now_location;
+        max_now_location=p_this;
+        p_max=max_now_location;//要给头指针更新，不然一直从原来位置开始
       }
       else
       {
+        while(max_now_location->next!=NULL)//判断max_now_location->next是否为空
+        {
+          if(max_now_location->next->value<p_this->value)//max_now_location定位指针下一个值比p_this值小
+          {
+            break;
+          }
+          else
+          {
+            max_now_location=max_now_location->next;
+          }
+        }
+        //max_now_location->next为空和max_now_location定位指针下一个值比p_this值小都会执行这里
+        //将p_this放置在max_now_location后 
         p_this->next=max_now_location->next;
         max_now_location->next=p_this;
       }
@@ -229,7 +240,15 @@ void show(void)
   }
   printf("exit");
   visit=p_max;
+  while (p_max!=NULL)
+  {
+    printf("%d",p_max->value);
+    p_max=p_max->next;
+  }
+  printf("\n");
   
+  
+  //拓展问题：考虑极端情况，我有100个uilabel，应该怎么编写，难道写100行set_text吗
   if(visit!=NULL)
   {
     lv_label_set_text_fmt(ui_Label1,"%s,value:{%d}\n",visit->name,visit->value);
@@ -245,3 +264,32 @@ void show(void)
     lv_label_set_text_fmt(ui_Label3,"%s,value:{%d}\n",visit->name,visit->value);
   }
 }
+
+// void update_chart(void){
+//   device* p = p_head;
+//     lv_chart_set_all_value(ui_Chart1,ui_Chart1_series_1,LV_CHART_POINT_NONE);  // 清空现有数据
+//     // 添加新数据到图表
+//     int count = 0;
+//     while (p != NULL) {
+//         lv_chart_set_next_value(ui_Chart1, ui_Chart1_series_1, p->value);
+//         count++;
+//         p = p->next;
+//     }
+
+//     // // 更新X轴标签
+//     // update_x_labels(count);
+// }
+
+// void update_x_labels(int count){
+//     lv_chart_set_x_tick_texts(ui_Chart1, NULL, count, LV_CHART_AXIS_DRAW_LAST_TICK);  // 清除现有标签
+//     char buf[1024] = {0};
+//     char *ptr = buf;
+//     device *d = p_head;
+
+//     // 构建以'\0'分隔的设备名字符串
+//     while (d != NULL) {
+//         ptr += sprintf(ptr, "%s", d->name) + 1;
+//         d = d->next;
+//     }
+//     lv_chart_set_x_tick_texts(ui_Chart1, buf, count, LV_CHART_AXIS_DRAW_LAST_TICK); // 设置新标签
+// }

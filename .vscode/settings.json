@@ -28,6 +28,9 @@
         "wifi.h": "c",
         "arduino.h": "c",
         "cstring": "cpp",
-        "typeinfo": "cpp"
-    }
+        "typeinfo": "cpp",
+        "string": "cpp",
+        "array": "c"
+    },
+    "cmake.sourceDirectory": "D:/data/PlatformIO/watch/.pio/libdeps/esp32-s3-devkitm-1/ArduinoJson/src"
 }
